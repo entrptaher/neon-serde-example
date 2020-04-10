@@ -8,7 +8,7 @@ edition = "2018"
 exclude = ["artifacts.json", "index.node"]
 
 [lib]
-# name="object"
+name="object"
 path="src/main.rs"
 crate-type = ["cdylib"]
 

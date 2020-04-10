@@ -3,23 +3,23 @@ extern crate serde_json;
 
 use std::fmt;
 
-use serde::de::{Visitor, Deserializer};
 use neon::prelude::*;
 use neon_serde;
+use serde::de::{Deserializer, Visitor};
 
-use serde::{Deserialize};
+use serde::Deserialize;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 struct Data {
     name: Name,
-    index: usize
+    index: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Link {
     page: Page,
     group: Group,
-    stuff: Data
+    stuff: Data,
 }
 
 #[derive(Debug, Serialize, PartialOrd, Ord, PartialEq, Eq, Clone, Copy)]
@@ -101,22 +101,30 @@ impl<'de> Deserialize<'de> for Name {
 }
 
 #[derive(Deserialize)]
-struct ObjectTuple<K,V>(#[serde(with = "tuple_vec_map")] Vec<(K,V)>) where K: serde::de::DeserializeOwned, V: serde::de::DeserializeOwned;
+struct ObjectTuple<K, V>(#[serde(with = "tuple_vec_map")] Vec<(K, V)>)
+where
+    K: serde::de::DeserializeOwned,
+    V: serde::de::DeserializeOwned;
 
 pub fn hello(input: String) -> String {
-  let object : ObjectTuple<Page, ObjectTuple<Group, Vec<Data>>> = serde_json::from_str(& input).unwrap();
+    let object: ObjectTuple<Page, ObjectTuple<Group, Vec<Data>>> =
+        serde_json::from_str(&input).unwrap();
 
-  let list: Vec<Link> = object.0.iter().map(|(page_key, page)| {
-      page.0.iter().map(move |(group_key, group)| {
-         group.iter().map(move |data| {
-             Link {
-                 stuff: *data,
-                 page: *page_key,
-                 group: *group_key
-             }
-         })
-      })
-  }).flatten().flatten().collect();
+    let list: Vec<Link> = object
+        .0
+        .iter()
+        .map(|(page_key, page)| {
+            page.0.iter().map(move |(group_key, group)| {
+                group.iter().map(move |data| Link {
+                    stuff: *data,
+                    page: *page_key,
+                    group: *group_key,
+                })
+            })
+        })
+        .flatten()
+        .flatten()
+        .collect();
 
     let result = serde_json::to_string(&list).unwrap();
     return format!("{}", result);

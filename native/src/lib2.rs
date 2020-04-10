@@ -13,21 +13,21 @@ use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
 struct Link {
-  page: String,
-  group: String,
-  name: String,
-  index: usize,
+    page: String,
+    group: String,
+    name: String,
+    index: usize,
 }
 
 #[derive(Serialize, Deserialize)]
 struct NamedIndex {
-  pub name: String,
-  pub index: usize,
+    pub name: String,
+    pub index: usize,
 }
 
 export! {
     fn hello(input: String) -> String {
-        let mut object: HashMap<String, HashMap<String, Vec<NamedIndex>>> 
+        let mut object: HashMap<String, HashMap<String, Vec<NamedIndex>>>
             = serde_json::from_str(&input).unwrap();
         let mut list: Vec<Link> = Vec::with_capacity(512);
 
