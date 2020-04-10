@@ -67,7 +67,7 @@ node lib/index.js
 
 ## Performance
 
-Benchmarked 1k items, inside javascript context using benchrmark.js
+Benchmarked 1k items inside page1.group1, inside javascript context using benchrmark.js
 
 ```
 ➜  node lib/benchmark.js
