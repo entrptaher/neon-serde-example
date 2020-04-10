@@ -10,6 +10,7 @@
     "neon-cli": "^0.4.0"
   },
   "scripts": {
-    "install": "neon build"
+    "build": "RUSTFLAGS=\"-Ctarget-cpu=native\" neon build --release",
+    "install": "yarn run build"
   }
 }

@@ -6,7 +6,6 @@ use neon_serde;
 
 #[macro_use]
 extern crate serde_derive;
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
