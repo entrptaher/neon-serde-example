@@ -20,3 +20,4 @@ serde_derive = "1.0.106"
 serde = "1.0.106"
 serde_json = "1.0.51"
 neon-serde = { git = "https://github.com/entrptaher/neon-serde" }
+serde-tuple-vec-map = "*"
