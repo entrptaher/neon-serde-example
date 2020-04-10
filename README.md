@@ -2,7 +2,7 @@ Created for reddit thread: [Deserialize an arbitrary json structure](https://www
 
 # Original implementation
 
-Grabs data from javascript, converts to serde_json::Value using neon_serde::from_value, iterate them using multiple loops, and convert the data back using neon_serde::to_value to a proper JsValue.
+Grabs stringified json data from javascript, converts to serde_json::Value using serde_json::from_str, iterate them using multiple loops, and convert the data back using serde_json::to_string to a proper String, finally JSON.parse.
 
 ## Development
 ```
@@ -70,8 +70,8 @@ node lib/index.js
 Benchmarked 1k items inside page1.group1, inside javascript context using benchrmark.js
 
 ```
-➜  node lib/benchmark.js
-native.module x 171 ops/sec ±0.37% (86 runs sampled)
-javascript x 2,337 ops/sec ±1.10% (94 runs sampled)
+➜  node lib/benchmark.js 
+native.module x 594 ops/sec ±0.47% (92 runs sampled)
+javascript x 2,446 ops/sec ±0.93% (90 runs sampled)
 Fastest is javascript
 ```
