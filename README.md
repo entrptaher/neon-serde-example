@@ -2,7 +2,22 @@ Created for reddit thread: [Deserialize an arbitrary json structure](https://www
 
 # Original implementation
 
-Grabs stringified json data from javascript, converts to serde_json::Value using serde_json::from_str, iterate them using multiple loops, and convert the data back using serde_json::to_string to a proper String, finally JSON.parse.
+- Grabs stringified json data from javascript, 
+- converts to serde_json::Value using serde_json::from_str, 
+- iterate them using multiple loops, 
+- convert the data back using serde_json::to_string to a proper String, 
+- finally JSON.parse.
+
+## Performance
+
+Benchmarked 1k items inside page1.group1, inside javascript context using benchrmark.js
+
+```
+➜  node lib/benchmark.js 
+native.module x 594 ops/sec ±0.47% (92 runs sampled)
+javascript x 2,446 ops/sec ±0.93% (90 runs sampled)
+Fastest is javascript
+```
 
 ## Development
 ```
@@ -63,15 +78,4 @@ node lib/index.js
     }
   }
 ]
-```
-
-## Performance
-
-Benchmarked 1k items inside page1.group1, inside javascript context using benchrmark.js
-
-```
-➜  node lib/benchmark.js 
-native.module x 594 ops/sec ±0.47% (92 runs sampled)
-javascript x 2,446 ops/sec ±0.93% (90 runs sampled)
-Fastest is javascript
 ```
