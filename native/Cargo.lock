@@ -215,6 +215,7 @@ dependencies = [
  "neon-build",
  "neon-serde",
  "serde",
+ "serde-tuple-vec-map",
  "serde_derive",
  "serde_json",
 ]
@@ -287,6 +288,15 @@ name = "serde"
 version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36df6ac6412072f67cf767ebbde4133a5b2e88e76dc6187fa7104cd16f783399"
+
+[[package]]
+name = "serde-tuple-vec-map"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fb19e2d413f0c7c977fbb859eba82d3027e6da303749c6a5476d9f0ed3b9c76"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "serde_derive"

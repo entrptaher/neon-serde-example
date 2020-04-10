@@ -7,6 +7,8 @@ use serde::de::{Visitor, Deserializer};
 use neon::prelude::*;
 use neon_serde;
 
+#[macro_use]
+extern crate serde_derive;
 use serde::{Deserialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
@@ -103,21 +105,29 @@ impl<'de> Deserialize<'de> for Name {
 #[derive(Deserialize)]
 struct ObjectTuple<K,V>(#[serde(with = "tuple_vec_map")] Vec<(K,V)>) where K: serde::de::DeserializeOwned, V: serde::de::DeserializeOwned;
 
-pub fn hello(input: String) -> String {
-  let object : ObjectTuple<Page, ObjectTuple<Group, Vec<Data>>> = serde_json::from_str(& input).unwrap();
+fn hello(mut cx: FunctionContext) -> JsResult<JsValue> {
+    let arg0: String = cx.argument::<JsString>(0)?.value();
 
-  let list: Vec<Link> = object.0.iter().map(|(page_key, page)| {
-      page.0.iter().map(move |(group_key, group)| {
-         group.iter().map(move |data| {
-             Link {
-                 stuff: *data,
-                 page: *page_key,
-                 group: *group_key
-             }
-         })
-      })
-  }).flatten().flatten().collect();
+    let object : ObjectTuple<Page, ObjectTuple<Group, Vec<Data>>> = serde_json::from_str(& arg0).unwrap();
 
-    let result = serde_json::to_string(&list).unwrap();
-    return format!("{}", result);
+    let list: Vec<Link> = object.0.iter().map(|(page_key, page)| {
+        page.0.iter().map(move |(group_key, group)| {
+           group.iter().map(move |data| {
+               Link {
+                   stuff: *data,
+                   page: *page_key,
+                   group: *group_key
+               }
+           })
+        })
+    }).flatten().flatten().collect();
+
+    // return back to nodejs
+    let result = neon_serde::to_value(&mut cx, &list)?;
+
+    Ok(result)
+    // println!("{:#?}", list);
+    // Ok(cx.undefined().upcast())
 }
+
+register_module!(mut cx, { cx.export_function("hello", hello) });
