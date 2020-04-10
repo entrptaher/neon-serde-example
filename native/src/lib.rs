@@ -4,7 +4,10 @@ extern crate serde_json;
 use std::fmt;
 
 use neon::prelude::*;
-use neon_serde;
+
+#[macro_use]
+extern crate neon_serde;
+
 use serde::de::{Deserializer, Visitor};
 
 #[macro_use]
@@ -108,11 +111,10 @@ where
     K: serde::de::DeserializeOwned,
     V: serde::de::DeserializeOwned;
 
-fn hello(mut cx: FunctionContext) -> JsResult<JsValue> {
-    let arg0: String = cx.argument::<JsString>(0)?.value();
-
-    let object: ObjectTuple<Page, ObjectTuple<Group, Vec<Data>>> =
-        serde_json::from_str(&arg0).unwrap();
+export! {
+    fn hello(input: String) -> String {
+        let object: ObjectTuple<Page, ObjectTuple<Group, Vec<Data>>> =
+        serde_json::from_str(&input).unwrap();
 
     let list: Vec<Link> = object
         .0
@@ -131,9 +133,7 @@ fn hello(mut cx: FunctionContext) -> JsResult<JsValue> {
         .collect();
 
     // return back to nodejs
-    let result = neon_serde::to_value(&mut cx, &list)?;
-
-    Ok(result)
+    let result = serde_json::to_string(&list).unwrap();
+    return format!("{}", result);
+    }
 }
-
-register_module!(mut cx, { cx.export_function("hello", hello) });

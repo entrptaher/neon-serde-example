@@ -1,20 +1,21 @@
 Created for reddit thread: [Deserialize an arbitrary json structure](https://www.reddit.com/r/rust/comments/fyevnx/deserialize_an_arbitrary_json_structure/)
 
-# kflansburg: ObjectTuple implementation
+# kflansburg: ObjectTuple + String implementation
 
 - Grabs stringified json data from javascript,
-- converts to serde_json::Value using serde_json::from_str
+- converts to ObjectTuple using serde_json::from_str
 - iterate them using multiple loops,
-- convert the data back using neon_serde::to_vazlue to a proper JsValue,
+- convert the data back using neon_serde::to_string to a proper String,
+- Uses JSON.parse to get final value
 
 ## Performance
 
 Benchmarked 1k items inside page1.group1, inside javascript context using benchrmark.js
 
 ```
-➜  node lib/benchmark.js 
-native.module x 548 ops/sec ±0.80% (90 runs sampled)
-javascript x 2,414 ops/sec ±0.89% (89 runs sampled)
+➜  node lib/benchmark.js                          
+native.module x 1,211 ops/sec ±0.34% (93 runs sampled)
+javascript x 2,445 ops/sec ±0.93% (92 runs sampled)
 Fastest is javascript
 ```
 
