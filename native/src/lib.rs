@@ -9,31 +9,44 @@ extern crate serde_derive;
 extern crate neon_serde;
 
 use neon::prelude::*;
-use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
 struct Link {
-    page_key: String,
-    group_key: String,
-    stuff: Value,
+    page: String,
+    group: String,
+    name: String,
+    index: usize,
+}
+
+#[derive(Serialize, Deserialize)]
+struct NamedIndex {
+    pub name: String,
+    pub index: usize,
 }
 
 export! {
     fn hello(input: String) -> String {
-        let mut list = vec![];
-        let object: Value = serde_json::from_str(&input).unwrap();
-        for (page_key, page) in object.as_object().unwrap().iter() {
-            for (group_key, group) in page.as_object().unwrap().iter() {
-                for stuff in group.as_array().unwrap() {
-                    let link = Link {
-                        page_key: page_key.to_string(),
-                        group_key: group_key.to_string(),
-                        stuff: stuff.clone(),
-                    };
-                    list.push(link);
+        let mut data: HashMap<String, HashMap<String, Vec<NamedIndex>>>
+            = serde_json::from_str(&input).unwrap();
+
+        let mut list: Vec<Link> = Vec::with_capacity(512);
+
+        for (page, mut groups) in data.drain() {
+            for (group, mut named_indexes) in groups.drain() {
+                for NamedIndex { name, index } in named_indexes.drain(..) {
+                    let page = page.clone();
+                    let group = group.clone();
+                    list.push(Link {
+                        page,
+                        group,
+                        name,
+                        index,
+                    });
                 }
             }
         }
+
         let result = serde_json::to_string(&list).unwrap();
         return format!("{}", result);
     }
