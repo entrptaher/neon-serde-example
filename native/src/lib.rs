@@ -11,24 +11,46 @@ extern crate neon_serde;
 use neon::prelude::*;
 use serde_json::Value;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Link {
     page_key: String,
     group_key: String,
     stuff: Value,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Stuff {
+    name: String,
+    index: usize,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Group {
+    identifier: String,
+    data: Vec<Stuff>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Page {
+    identifier: String,
+    data: Vec<Group>,
+}
+
+use rayon::prelude::*;
+
 export! {
-    fn hello(input: String) -> String {
-        let mut list = vec![];
-        let object: Value = serde_json::from_str(&input).unwrap();
-        for (page_key, page) in object.as_object().unwrap().iter() {
-            for (group_key, group) in page.as_object().unwrap().iter() {
-                for stuff in group.as_array().unwrap() {
+    fn string(input: String) -> String {
+        // let list = vec![""];
+        let mut list: Vec<Link> = vec![];
+        let object: Vec<Page> = serde_json::from_str(&input).unwrap();
+        // println!("{:#?}", object);
+        for page in object.iter(){
+            for group in page.data.iter(){
+                for stuff in group.data.iter(){
                     let link = Link {
-                        page_key: page_key.to_string(),
-                        group_key: group_key.to_string(),
-                        stuff: stuff.clone(),
+                        page_key: page.identifier.to_string(),
+                        group_key: group.identifier.to_string(),
+                        stuff: serde_json::to_value(stuff).unwrap(),
                     };
                     list.push(link);
                 }
@@ -36,5 +58,6 @@ export! {
         }
         let result = serde_json::to_string(&list).unwrap();
         return format!("{}", result);
+        // return "{\"hello\": 123}".to_string();
     }
 }
