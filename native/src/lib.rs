@@ -9,9 +9,21 @@ pub mod hashmap;
 pub mod objecttuple;
 
 register_module!(mut cx, {
-    cx.export_function("hashmap_buffer_neon_value", hashmap::buffer_neon_value);
-    cx.export_function("hashmap_buffer_serde_string", hashmap::buffer_serde_string);
-    cx.export_function("objecttuple_string_neon_value", objecttuple::string_neon_value);
-    cx.export_function("objecttuple_string_serde_string", objecttuple::string_serde_string);
+    cx.export_function("hashmap_buffer_neon_value", hashmap::buffer_neon_value)
+        .expect("export function");
+    cx.export_function("hashmap_buffer_serde_string", hashmap::buffer_serde_string)
+        .expect("export function");
+    cx.export_function("hashmap_string_serde_string", hashmap::string_serde_string)
+        .expect("export function");
+    cx.export_function(
+        "objecttuple_string_neon_value",
+        objecttuple::string_neon_value,
+    )
+    .expect("export function");
+    cx.export_function(
+        "objecttuple_string_serde_string",
+        objecttuple::string_serde_string,
+    )
+    .expect("export function");
     Ok(())
 });
