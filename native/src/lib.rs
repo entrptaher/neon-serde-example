@@ -11,8 +11,8 @@ use neon::prelude::*;
 
 // STD
 use rayon::prelude::*;
-use std::collections::HashMap;
 use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 // STRUCTS
 #[derive(Serialize, Deserialize)]
@@ -68,13 +68,9 @@ fn type_of<T>(_: T) -> &'static str {
     type_name::<T>()
 }
 
-fn direct(mut cx: FunctionContext) -> JsResult<JsString> {
-    let buf = cx.argument::<JsBuffer>(0)?;
-    let buf = cx.borrow(&buf, |data| data.as_slice().to_vec());
-    let task = Buffer { buf: &buf };
-
+fn hash_map(buffer: Buffer) -> Vec<Link> {
     let mut data: HashMap<String, HashMap<String, Vec<NamedIndex>>> =
-        serde_json::from_slice(task.buf).unwrap();
+        serde_json::from_slice(buffer.buf).unwrap();
 
     let mut list: Vec<Link> = Vec::with_capacity(512);
     for (page, mut groups) in data.drain() {
@@ -91,63 +87,43 @@ fn direct(mut cx: FunctionContext) -> JsResult<JsString> {
             }
         }
     }
-    // for (page, groups) in data.iter() {
-    //     for (group, named_indexes) in groups.iter() {
+    list
+}
 
-            // list.extend(get_indexes(page, group, named_indexes))
-            // list.par_extend(named_indexes.into_par_iter().map(|x| Link {
-            //     page: page.clone(),
-            //     group: group.clone(),
-            //     name: x.name.clone(),
-            //     index: x.index.clone(),
-            // }))
-    //     }
-    // }
-    // let js_value = neon_serde::to_value(&mut cx, &list)?;
-    // Ok(js_value)
+// for (page, groups) in data.iter() {
+//     for (group, named_indexes) in groups.iter() {
+
+// list.extend(get_indexes(page, group, named_indexes))
+// list.par_extend(named_indexes.into_par_iter().map(|x| Link {
+//     page: page.clone(),
+//     group: group.clone(),
+//     name: x.name.clone(),
+//     index: x.index.clone(),
+// }))
+//     }
+// }
+// let js_value = neon_serde::to_value(&mut cx, &list)?;
+// Ok(js_value)
+fn buffer_neon_value(mut cx: FunctionContext) -> JsResult<JsValue> {
+    let buf = cx.argument::<JsBuffer>(0)?;
+    let buf = cx.borrow(&buf, |data| data.as_slice().to_vec());
+    let task = Buffer { buf: &buf };
+    let list = hash_map(task);
+    let js_value = neon_serde::to_value(&mut cx, &list)?;
+    Ok(js_value)
+}
+
+fn buffer_serde_string(mut cx: FunctionContext) -> JsResult<JsString> {
+    let buf = cx.argument::<JsBuffer>(0)?;
+    let buf = cx.borrow(&buf, |data| data.as_slice().to_vec());
+    let task = Buffer { buf: &buf };
+    let list = hash_map(task);
     let str_data = serde_json::to_string(&list).unwrap();
     Ok(cx.string(str_data))
 }
 
-struct BackgroundTask {
-    argument: usize
-}
- 
-
-fn fib(n: u64) -> u64 {
-    if n <= 1 { return 1 }
-    fib(n - 1) + fib(n - 2)
-  }
-
-impl Task for BackgroundTask {
-    type Output = usize;
-    type Error = String;
-    type JsEvent = JsNumber;
-    fn perform(&self) -> Result<Self::Output, Self::Error> {
-        let num = self.argument;
-        Ok(fib(num as u64) as usize)
-    }
-    fn complete(
-        self,
-        mut cx: TaskContext,
-        result: Result<Self::Output, Self::Error>,
-    ) -> JsResult<Self::JsEvent> {
-        Ok(cx.number(result.unwrap() as f64))
-    }
-}
-
-pub fn perform_async_task(mut cx: FunctionContext) -> JsResult<JsUndefined> {
-    let n = cx.argument::<JsNumber>(0)?.value() as usize;
-    let cb = cx.argument::<JsFunction>(1)?;
-
-    let task = BackgroundTask { argument: n };
-    task.schedule(cb);
-
-    Ok(cx.undefined())
-}
-
 register_module!(mut cx, {
-    cx.export_function("par_array", perform_async_task);
-    cx.export_function("direct", direct);
+    cx.export_function("buffer_neon_value", buffer_neon_value);
+    cx.export_function("buffer_serde_string", buffer_serde_string);
     Ok(())
 });
