@@ -296,6 +296,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-bigint"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "090c7f9998ee0ff65aa5b723e4009f7b217707f1fb5ea551329cc4d6231fb304"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "num-complex"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -365,6 +376,8 @@ dependencies = [
  "neon",
  "neon-build",
  "neon-serde",
+ "num-bigint",
+ "num-traits",
  "rayon",
  "serde",
  "serde-tuple-vec-map",
