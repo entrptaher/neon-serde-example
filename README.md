@@ -6,24 +6,30 @@ Benchmarked 1k items inside page1.group1, inside javascript context using benchr
 
 ```
 ➜  node lib/index.js 
-init: 1.828ms
+init: 1.703ms
 { static: false, dynamic: { loop: 1000, singleArray: true } }
---------------
-js.unfair 0.34795ms
-js.buf 0.46733ms
-js.string 2.02784ms
-js.bufString 1.53930ms
-rust.hashmap_buffer_serde_string_no_parse 0.53442ms
-rust.hashmap_buffer_serde_string 0.85842ms
-rust.hashmap_buffer_neon_value 1.74317ms
---------------
-js.unfair x 91,452 ops/sec ±6.97% (85 runs sampled) x mean 0.0109ms
-js.buf x 3,986 ops/sec ±1.52% (87 runs sampled) x mean 0.2509ms
-js.string x 915 ops/sec ±0.96% (93 runs sampled) x mean 1.0929ms
-js.bufString x 915 ops/sec ±0.67% (94 runs sampled) x mean 1.0924ms
-rust.hashmap_buffer_serde_string_no_parse x 2,310 ops/sec ±0.86% (92 runs sampled) x mean 0.4328ms
-rust.hashmap_buffer_serde_string x 1,304 ops/sec ±0.60% (96 runs sampled) x mean 0.7671ms
-rust.hashmap_buffer_neon_value x 643 ops/sec ±0.47% (95 runs sampled) x mean 1.5558ms
+```
+
+The following assumes I am running all functions for first time, for just once.
+```
+js.unfair 0.31148ms
+js.buf 0.43268ms
+js.string 1.36488ms
+js.bufString 1.69201ms
+rust.hashmap_buffer_serde_string_no_parse 0.46569ms
+rust.hashmap_buffer_serde_string 0.82932ms
+rust.hashmap_buffer_neon_value 1.76512ms
+```
+
+Then the results from benchmark.js appears,
+```
+js.unfair x 98,727 ops/sec ±5.94% (87 runs sampled) x mean 0.0101ms
+js.buf x 4,036 ops/sec ±1.04% (92 runs sampled) x mean 0.2478ms
+js.string x 913 ops/sec ±0.64% (96 runs sampled) x mean 1.0949ms
+js.bufString x 917 ops/sec ±0.46% (95 runs sampled) x mean 1.0910ms
+rust.hashmap_buffer_serde_string_no_parse x 2,371 ops/sec ±0.34% (98 runs sampled) x mean 0.4217ms
+rust.hashmap_buffer_serde_string x 1,311 ops/sec ±0.66% (95 runs sampled) x mean 0.7630ms
+rust.hashmap_buffer_neon_value x 626 ops/sec ±0.36% (95 runs sampled) x mean 1.5967ms
 Fastest is js.unfair
 ```
 
