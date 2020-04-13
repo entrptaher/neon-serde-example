@@ -7,7 +7,8 @@
   "license": "MIT",
   "dependencies": {
     "benchmark": "^2.1.4",
-    "neon-cli": "^0.4.0"
+    "neon-cli": "^0.4.0",
+    "nodemark": "^0.3.0"
   },
   "scripts": {
     "build": "RUSTFLAGS=\"-Ctarget-cpu=native\" neon build --release",
