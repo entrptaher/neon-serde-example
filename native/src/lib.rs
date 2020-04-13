@@ -10,8 +10,9 @@ extern crate neon;
 use neon::prelude::*;
 
 // STD
-use rayon::prelude::*;
 use hashbrown::HashMap;
+use rayon::prelude::*;
+use std::collections::BTreeMap;
 
 // STRUCTS
 #[derive(Serialize, Deserialize)]
@@ -22,40 +23,52 @@ struct Link {
     index: usize,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct NamedIndex {
     pub name: String,
     pub index: usize,
 }
 
-struct BackgroundTask<'a> {
+struct Buffer<'a> {
     buf: &'a [u8],
 }
 
 // FN
+fn get_indexes(page: &String, group: &String, named_indexes: &Vec<NamedIndex>) -> Vec<Link> {
+    named_indexes.into_par_iter().map(|x| Link {
+        page: page.clone(),
+        group: group.clone(),
+        name: x.name.clone(),
+        index: x.index.clone(),
+    }).collect()
+}
+
+use std::any::type_name;
+
+fn type_of<T>(_: T) -> &'static str {
+    type_name::<T>()
+}
+
 fn direct(mut cx: FunctionContext) -> JsResult<JsString> {
     let buf = cx.argument::<JsBuffer>(0)?;
     let buf = cx.borrow(&buf, |data| data.as_slice().to_vec());
-    let task = BackgroundTask { buf: &buf };
+    let task = Buffer { buf: &buf };
 
-    let mut data: HashMap<String, HashMap<String, Vec<NamedIndex>>> = serde_json::from_slice(&task.buf).unwrap();
+    let data: BTreeMap<String, BTreeMap<String, Vec<NamedIndex>>> =
+        serde_json::from_slice(task.buf).unwrap();
+
     let mut list: Vec<Link> = Vec::with_capacity(512);
-    
-    for (page, mut groups) in data.drain() {
-        for (group, mut named_indexes) in groups.drain() {
-            for NamedIndex { name, index } in named_indexes.drain(..) {
-                let page = page.clone();
-                let group = group.clone();
-                list.push(Link {
-                    page,
-                    group,
-                    name,
-                    index,
-                });
-            }
+    for (page, groups) in data.iter() {
+        for (group, named_indexes) in groups.iter() {
+            list.extend(get_indexes(
+                page,
+                group,
+                named_indexes,
+            ))
         }
     }
-    
+    // let js_value = neon_serde::to_value(&mut cx, &list)?;
+    // Ok(js_value)
     let str_data = serde_json::to_string(&list).unwrap();
     Ok(cx.string(str_data))
 }
