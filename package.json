@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "benchmark": "^2.1.4",
+    "bl": "^4.0.2",
     "express": "^4.17.1",
     "neon-cli": "^0.4.0",
     "node-fetch": "^2.6.0",

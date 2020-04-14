@@ -9,7 +9,7 @@ app.get("/", (req, res) => {
     generateData({
       static: false,
       dynamic:{
-        loop: 1000000,
+        loop: 1000,
         singleArray: false
       }
     })
