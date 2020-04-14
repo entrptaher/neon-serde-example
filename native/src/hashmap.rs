@@ -22,7 +22,7 @@ struct Buffer<'a> {
     buf: &'a [u8],
 }
 
-fn hash_map(mut data: HashMap<String, HashMap<String, Vec<NamedIndex>>>) -> Vec<Link> {
+pub fn hash_map(mut data: HashMap<String, HashMap<String, Vec<NamedIndex>>>) -> Vec<Link> {
     let mut list: Vec<Link> = Vec::with_capacity(512);
     for (page, mut groups) in data.drain() {
         for (group, mut named_indexes) in groups.drain() {

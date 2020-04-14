@@ -9,43 +9,49 @@ pub mod hashmap;
 pub mod objecttuple;
 
 struct BackgroundTask {
-    argument: usize,
+    argument: String,
 }
 
-fn fib(n: u64) -> u64 {
-    if n <= 1 {
-        return 1;
-    }
-    fib(n - 1) + fib(n - 2)
+fn hello(input: String) -> String {
+    let mut prefix: String = "hello ".to_owned();
+    prefix.push_str(&input);
+    prefix
 }
 
 impl Task for BackgroundTask {
-    type Output = usize;
+    type Output = String;
     type Error = String;
-    type JsEvent = JsNumber;
+    type JsEvent = JsString;
     fn perform(&self) -> Result<Self::Output, Self::Error> {
-        let num = self.argument;
-        Ok(fib(num as u64) as usize)
+        let input = self.argument.to_string();
+        Ok(hello(input))
     }
     fn complete(
         self,
         mut cx: TaskContext,
         result: Result<Self::Output, Self::Error>,
     ) -> JsResult<Self::JsEvent> {
-        Ok(cx.number(result.unwrap() as f64))
+        Ok(cx.string(result.unwrap()))
     }
 }
 
 pub fn perform_async_task(mut cx: FunctionContext) -> JsResult<JsUndefined> {
-    let n = cx.argument::<JsNumber>(0)?.value() as usize;
+    let n = cx.argument::<JsString>(0)?.value() as String;
     let cb = cx.argument::<JsFunction>(1)?;
     let task = BackgroundTask { argument: n };
     task.schedule(cb);
     Ok(cx.undefined())
 }
 
+pub fn perform_sync_task(mut cx: FunctionContext) -> JsResult<JsString> {
+    let n = cx.argument::<JsString>(0)?.value() as String;
+    let task = hello(n);
+    Ok(cx.string(task))
+}
+
 register_module!(mut cx, {
     cx.export_function("perform_async_task", perform_async_task);
+    cx.export_function("perform_sync_task", perform_sync_task);
 
     cx.export_function("hashmap_buffer_neon_value", hashmap::buffer_neon_value)
         .expect("export function");
