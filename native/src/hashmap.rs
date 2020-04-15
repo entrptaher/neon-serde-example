@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 // STRUCTS
 #[derive(Serialize, Deserialize)]
-struct Link {
+pub struct Link {
     page: String,
     group: String,
     name: String,
@@ -13,7 +13,7 @@ struct Link {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-struct NamedIndex {
+pub struct NamedIndex {
     pub name: String,
     pub index: usize,
 }
@@ -70,4 +70,11 @@ pub fn string_serde_string(mut cx: FunctionContext) -> JsResult<JsString> {
     let list = hash_map(data);
     let str_data = serde_json::to_string(&list).unwrap();
     Ok(cx.string(str_data))
+}
+
+pub fn hello(input: String) -> String {
+    let data: HashMap<String, HashMap<String, Vec<NamedIndex>>> =
+        serde_json::from_str(&input).unwrap();
+    let list = hash_map(data);
+    serde_json::to_string(&list).unwrap()
 }

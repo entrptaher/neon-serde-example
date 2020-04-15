@@ -12,19 +12,13 @@ struct BackgroundTask {
     argument: String,
 }
 
-fn hello(input: String) -> String {
-    let mut prefix: String = "hello ".to_owned();
-    prefix.push_str(&input);
-    prefix
-}
-
 impl Task for BackgroundTask {
     type Output = String;
     type Error = String;
     type JsEvent = JsString;
     fn perform(&self) -> Result<Self::Output, Self::Error> {
         let input = self.argument.to_string();
-        Ok(hello(input))
+        Ok(hashmap::hello(input))
     }
     fn complete(
         self,
@@ -45,7 +39,7 @@ pub fn perform_async_task(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 
 pub fn perform_sync_task(mut cx: FunctionContext) -> JsResult<JsString> {
     let n = cx.argument::<JsString>(0)?.value() as String;
-    let task = hello(n);
+    let task = hashmap::hello(n);
     Ok(cx.string(task))
 }
 
